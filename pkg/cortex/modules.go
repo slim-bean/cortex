@@ -60,6 +60,7 @@ const (
 	Compactor
 	MemberlistKV
 	All
+	Writer
 )
 
 func (m moduleName) String() string {
@@ -98,6 +99,8 @@ func (m moduleName) String() string {
 		return "memberlist-kv"
 	case All:
 		return "all"
+	case Writer:
+		return "writer"
 	default:
 		panic(fmt.Sprintf("unknown module name: %d", m))
 	}
@@ -149,6 +152,9 @@ func (m *moduleName) Set(s string) error {
 		return nil
 	case "all":
 		*m = All
+		return nil
+	case "writer":
+		*m = Writer
 		return nil
 	default:
 		return fmt.Errorf("unrecognised module name: %s", s)
@@ -669,5 +675,9 @@ var modules = map[moduleName]module{
 
 	All: {
 		deps: []moduleName{Querier, Ingester, Distributor, TableManager},
+	},
+
+	Writer: {
+		deps: []moduleName{Ingester, Distributor},
 	},
 }
