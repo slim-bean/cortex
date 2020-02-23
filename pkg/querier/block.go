@@ -160,13 +160,33 @@ func convertMatchersToLabelMatcher(matchers []*labels.Matcher) []storepb.LabelMa
 }
 
 func (b *blocksQuerier) LabelValues(name string) ([]string, storage.Warnings, error) {
-	// Cortex doesn't use this. It will ask ingesters for metadata.
-	return nil, nil, errors.New("not implemented")
+	ctx := b.addUserToContext(b.ctx)
+	resp, err := b.client.LabelValues(ctx, &storepb.LabelValuesRequest{Label: name, PartialResponseDisabled: true})
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "proxy LabelValues()")
+	}
+
+	var warns storage.Warnings
+	for _, w := range resp.Warnings {
+		warns = append(warns, errors.New(w))
+	}
+
+	return resp.Values, warns, nil
 }
 
 func (b *blocksQuerier) LabelNames() ([]string, storage.Warnings, error) {
-	// Cortex doesn't use this. It will ask ingesters for metadata.
-	return nil, nil, errors.New("not implemented")
+	ctx := b.addUserToContext(b.ctx)
+	resp, err := b.client.LabelNames(ctx, &storepb.LabelNamesRequest{PartialResponseDisabled: true})
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "proxy LabelNames()")
+	}
+
+	var warns storage.Warnings
+	for _, w := range resp.Warnings {
+		warns = append(warns, errors.New(w))
+	}
+
+	return resp.Names, warns, nil
 }
 
 func (b *blocksQuerier) Close() error {

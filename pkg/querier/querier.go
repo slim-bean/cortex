@@ -143,7 +143,7 @@ func NewQueryable(distributor, store storage.Queryable, chunkIterFn chunkIterato
 			chunkIterFn: chunkIterFn,
 		}
 
-		dqr, err := distributor.Querier(ctx, mint, maxt)
+		dqr, err := store.Querier(ctx, mint, maxt)
 		if err != nil {
 			return nil, err
 		}
