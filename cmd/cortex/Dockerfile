@@ -1,11 +1,11 @@
-FROM       alpine:3.12
-RUN        apk add --no-cache ca-certificates
-COPY       migrations /migrations/
-COPY       cortex /bin/cortex
-EXPOSE     80
-ENTRYPOINT [ "/bin/cortex" ]
+FROM golang:1.13-alpine AS builder
+COPY . /build
+WORKDIR /build
+RUN CGO_ENABLED=0 go build -ldflags "-extldflags \"-static\" -s -w" -tags netgo -o cortex ./cmd/cortex/main.go
+RUN mv /build/cortex /
 
-ARG revision
-LABEL org.opencontainers.image.title="cortex" \
-      org.opencontainers.image.source="https://github.com/cortexproject/cortex/tree/master/cmd/cortex" \
-      org.opencontainers.image.revision="${revision}"
+FROM alpine:3.8
+RUN        apk add --no-cache ca-certificates
+WORKDIR /
+COPY --from=builder /cortex /cortex
+ENTRYPOINT ["/cortex"]
