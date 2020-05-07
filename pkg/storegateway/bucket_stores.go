@@ -199,6 +199,40 @@ func (u *BucketStores) Series(req *storepb.SeriesRequest, srv storepb.Store_Seri
 	return store.Series(req, srv)
 }
 
+func (u *BucketStores) LabelNames(ctx context.Context, req *storepb.LabelNamesRequest) (*storepb.LabelNamesResponse, error) {
+	log, ctx := spanlogger.New(ctx, "BucketStores.LabelNames")
+	defer log.Span.Finish()
+
+	userID := getUserIDFromGRPCContext(ctx)
+	if userID == "" {
+		return nil, fmt.Errorf("no userID")
+	}
+
+	store := u.getStore(userID)
+	if store == nil {
+		return nil, nil
+	}
+
+	return store.LabelNames(ctx, req)
+}
+
+func (u *BucketStores) LabelValues(ctx context.Context, req *storepb.LabelValuesRequest) (*storepb.LabelValuesResponse, error) {
+	log, ctx := spanlogger.New(ctx, "BucketStores.LabelValues")
+	defer log.Span.Finish()
+
+	userID := getUserIDFromGRPCContext(ctx)
+	if userID == "" {
+		return nil, fmt.Errorf("no userID")
+	}
+
+	store := u.getStore(userID)
+	if store == nil {
+		return nil, nil
+	}
+
+	return store.LabelValues(ctx, req)
+}
+
 func (u *BucketStores) getStore(userID string) *store.BucketStore {
 	u.storesMu.RLock()
 	store := u.stores[userID]

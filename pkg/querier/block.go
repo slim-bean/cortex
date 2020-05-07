@@ -140,8 +140,8 @@ func convertMatchersToLabelMatcher(matchers []*labels.Matcher) []storepb.LabelMa
 }
 
 func (b *blocksQuerier) LabelValues(name string) ([]string, storage.Warnings, error) {
-	ctx := b.addUserToContext(b.ctx)
-	resp, err := b.client.LabelValues(ctx, &storepb.LabelValuesRequest{Label: name, PartialResponseDisabled: true})
+
+	resp, err := b.userStores.LabelValues(b.ctx, b.userID, &storepb.LabelValuesRequest{Label: name, PartialResponseDisabled: true})
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "proxy LabelValues()")
 	}
@@ -155,8 +155,7 @@ func (b *blocksQuerier) LabelValues(name string) ([]string, storage.Warnings, er
 }
 
 func (b *blocksQuerier) LabelNames() ([]string, storage.Warnings, error) {
-	ctx := b.addUserToContext(b.ctx)
-	resp, err := b.client.LabelNames(ctx, &storepb.LabelNamesRequest{PartialResponseDisabled: true})
+	resp, err := b.userStores.LabelNames(b.ctx, b.userID, &storepb.LabelNamesRequest{PartialResponseDisabled: true})
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "proxy LabelNames()")
 	}

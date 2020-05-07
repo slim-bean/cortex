@@ -113,6 +113,18 @@ func (s *BucketStoresService) Series(ctx context.Context, userID string, req *st
 	return srv.SeriesSet, srv.Warnings, nil
 }
 
+func (s *BucketStoresService) LabelNames(ctx context.Context, userID string, req *storepb.LabelNamesRequest) (*storepb.LabelNamesResponse, error) {
+	ctx = setUserIDToGRPCContext(ctx, userID)
+	return s.stores.LabelNames(ctx, req)
+}
+
+func (s *BucketStoresService) LabelValues(ctx context.Context, userID string, req *storepb.LabelValuesRequest) (*storepb.LabelValuesResponse, error) {
+	// Inject the user ID into the context metadata, as expected by BucketStores.
+	ctx = setUserIDToGRPCContext(ctx, userID)
+
+	return s.stores.LabelValues(ctx, req)
+}
+
 func setUserIDToGRPCContext(ctx context.Context, userID string) context.Context {
 	// We have to store it in the incoming metadata because we have to emulate the
 	// case it's coming from a gRPC request, while here we're running everything in-memory.
