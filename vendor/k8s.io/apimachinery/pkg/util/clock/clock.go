@@ -21,18 +21,11 @@ import (
 	"time"
 )
 
-// PassiveClock allows for injecting fake or real clocks into code
-// that needs to read the current time but does not support scheduling
-// activity in the future.
-type PassiveClock interface {
-	Now() time.Time
-	Since(time.Time) time.Duration
-}
-
 // Clock allows for injecting fake or real clocks into code that
 // needs to do arbitrary things based on time.
 type Clock interface {
-	PassiveClock
+	Now() time.Time
+	Since(time.Time) time.Duration
 	After(time.Duration) <-chan time.Time
 	NewTimer(time.Duration) Timer
 	Sleep(time.Duration)
@@ -73,15 +66,10 @@ func (RealClock) Sleep(d time.Duration) {
 	time.Sleep(d)
 }
 
-// FakePassiveClock implements PassiveClock, but returns an arbitrary time.
-type FakePassiveClock struct {
-	lock sync.RWMutex
-	time time.Time
-}
-
 // FakeClock implements Clock, but returns an arbitrary time.
 type FakeClock struct {
-	FakePassiveClock
+	lock sync.RWMutex
+	time time.Time
 
 	// waiters are waiting for the fake time to pass their specified time
 	waiters []fakeClockWaiter
@@ -94,37 +82,24 @@ type fakeClockWaiter struct {
 	destChan      chan time.Time
 }
 
-func NewFakePassiveClock(t time.Time) *FakePassiveClock {
-	return &FakePassiveClock{
+func NewFakeClock(t time.Time) *FakeClock {
+	return &FakeClock{
 		time: t,
 	}
 }
 
-func NewFakeClock(t time.Time) *FakeClock {
-	return &FakeClock{
-		FakePassiveClock: *NewFakePassiveClock(t),
-	}
-}
-
 // Now returns f's time.
-func (f *FakePassiveClock) Now() time.Time {
+func (f *FakeClock) Now() time.Time {
 	f.lock.RLock()
 	defer f.lock.RUnlock()
 	return f.time
 }
 
 // Since returns time since the time in f.
-func (f *FakePassiveClock) Since(ts time.Time) time.Duration {
+func (f *FakeClock) Since(ts time.Time) time.Duration {
 	f.lock.RLock()
 	defer f.lock.RUnlock()
 	return f.time.Sub(ts)
-}
-
-// Sets the time.
-func (f *FakePassiveClock) SetTime(t time.Time) {
-	f.lock.Lock()
-	defer f.lock.Unlock()
-	f.time = t
 }
 
 // Fake version of time.After(d).

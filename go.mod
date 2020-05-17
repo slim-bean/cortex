@@ -16,6 +16,7 @@ require (
 	github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d
 	github.com/armon/go-metrics v0.3.0
 	github.com/aws/aws-sdk-go v1.27.0
+	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/blang/semver v3.5.0+incompatible
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b
 	github.com/cespare/xxhash v1.1.0
@@ -79,4 +80,4 @@ replace git.apache.org/thrift.git => github.com/apache/thrift v0.0.0-20180902110
 // Override reference that causes an error from Go proxy - see https://github.com/golang/go/issues/33558
 replace k8s.io/client-go => k8s.io/client-go v0.0.0-20190620085101-78d2af792bab
 
-replace github.com/thanos-io/thanos => github.com/slim-bean/thanos v0.8.1-0.20200506172237-34f064516005
+replace github.com/thanos-io/thanos => github.com/slim-bean/thanos v0.8.1-0.20200517190107-97de943695bc
