@@ -250,7 +250,7 @@ func buildS3Config(cfg S3Config) (*aws.Config, []string, error) {
 		MaxIdleConns:          100,
 		IdleConnTimeout:       cfg.HTTPConfig.IdleConnTimeout,
 		MaxIdleConnsPerHost:   100,
-		TLSHandshakeTimeout:   3 * time.Second,
+		TLSHandshakeTimeout:   30 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 		ResponseHeaderTimeout: time.Duration(cfg.HTTPConfig.ResponseHeaderTimeout),
 		TLSClientConfig:       &tls.Config{InsecureSkipVerify: cfg.HTTPConfig.InsecureSkipVerify},
